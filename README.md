@@ -16,6 +16,7 @@ To run the Streamlit dashboard, ensure that the following dependencies are insta
 
 - Streamlit: `pip install streamlit`
 - Pandas: `pip install pandas`
+- Numpy:  `pip install numpy`
 - Plotly: `pip install plotly`
 - Keras: `pip install keras`
 - scikit-learn: `pip install scikit-learn`
