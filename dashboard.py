@@ -7,7 +7,7 @@ import numpy as np
 
 scaler = MinMaxScaler(feature_range=(0,1))
 
-df_nse = pd.read_csv("/home/sherherd/Desktop/Assign/Dennoh/project.ipynb/NSE-Tata-Global-Beverages-Limited.csv")
+df_nse = pd.read_csv("/home/sherherd/Desktop/Assign/Dennoh/Tesla.csv")
 
 df_nse["Date"] = pd.to_datetime(df_nse.Date, format="%Y-%m-%d")
 df_nse.index = df_nse['Date']
