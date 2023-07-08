@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize']=20,10
 
-df = pd.read_csv("/home/sherherd/Desktop/Assign/Dennoh/project.ipynb/NSE-Tata-Global-Beverages-Limited.csv")
+df = pd.read_csv("/home/sherherd/Desktop/Assign/Dennoh/Tesla.csv")
 from sklearn.preprocessing import MinMaxScaler
 scaler=MinMaxScaler(feature_range=(0,1))
 df["Date"]= pd.to_datetime(df.Date,format="%Y-%m-%d")
