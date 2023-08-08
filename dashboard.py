@@ -29,6 +29,8 @@ valid = dataset[987:, :]
 scaler = MinMaxScaler(feature_range=(0,1))
 scaled_data = scaler.fit_transform(dataset)
 
+import numpy as np
+
 x_train, y_train = [], []
 
 for i in range(60, len(train)):
