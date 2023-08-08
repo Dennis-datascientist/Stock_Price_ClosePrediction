@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
-import TensorFlow
+import tensorFlow
 from keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
