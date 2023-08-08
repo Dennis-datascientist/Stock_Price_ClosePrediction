@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objs as go
-from keras.models import load_model
+
 from sklearn.preprocessing import MinMaxScaler
 
 scaler = MinMaxScaler(feature_range=(0,1))
@@ -38,7 +38,7 @@ for i in range(60, len(train)):
 x_train, y_train = np.array(x_train), np.array(y_train)
 
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-
+from keras.models import load_model
 model = load_model("saved_lstm_model.h5")
 
 inputs = new_data[len(new_data)-len(valid)-60:].values
