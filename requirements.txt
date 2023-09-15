@@ -2,3 +2,4 @@ gunicorn
 streamlit
 plotly
 scikit-learn
+tensorflow
