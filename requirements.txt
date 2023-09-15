@@ -3,3 +3,4 @@ streamlit
 plotly
 scikit-learn
 tensorflow
+protobuf
