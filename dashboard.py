@@ -41,7 +41,7 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-model = load_model("saved_lstm_model.h5")
+model = load_model(r"C:\Users\profi\Downloads\Job\saved_lstm_model.h5")
 
 inputs = new_data[len(new_data)-len(valid)-60:].values
 inputs = inputs.reshape(-1, 1)
@@ -82,48 +82,103 @@ if selected_tab == "Tesla Stock Data":
     fig_predicted.update_layout(title='LSTM Predicted Closing Price Over Time', xaxis={'title': 'Date'}, yaxis={'title': 'Closing Rate'})
     st.plotly_chart(fig_predicted)
 
+    st.header("Closing Price Distribution")
+    fig_distribution = go.Figure(data=go.Histogram(x=valid["Close"], nbinsx=20))
+    fig_distribution.update_layout(title='Closing Price Distribution', xaxis={'title': 'Closing Rate'}, yaxis={'title': 'Frequency'})
+    st.plotly_chart(fig_distribution)
+
 elif selected_tab == "Facebook Stock Data":
-    st.header("Facebook Stocks High vs Lows")
-    selected_stocks = st.multiselect("Select Stocks", ['AAPL', 'FB', 'MSFT'], default=['FB'])
+    st.header("Facebook Stocks Analysis")
+
+    # Use a unique key for each multiselect widget
+    multiselect_key = "select_stocks_" + selected_tab.replace(" ", "_")
+    
+    selected_stocks = st.multiselect("Select Stocks", ['AAPL', 'FB', 'MSFT'], default=['FB'], key=multiselect_key)
     dropdown = {"AAPL": "Apple", "FB": "Facebook", "MSFT": "Microsoft"}
 
-    fig_highlow = go.Figure()
-    for stock in selected_stocks:
-        fig_highlow.add_trace(go.Scatter(x=df[df["Stock"] == stock]["Date"],
-                                         y=df[df["Stock"] == stock]["High"],
-                                         mode='lines',
-                                         opacity=0.7,
-                                         name=f'High {dropdown[stock]}',
-                                         textposition='bottom center'))
-    fig_highlow.update_layout(title=f"High and Low Prices for {', '.join(str(dropdown[i]) for i in selected_stocks)} Over Time",
-                              xaxis={"title": "Date",
-                                     'rangeselector': {'buttons': list([{'count': 1, 'label': '1M', 'step': 'month',
-                                                                          'stepmode': 'backward'},
-                                                                         {'count': 6, 'label': '6M', 'step': 'month',
-                                                                          'stepmode': 'backward'},
-                                                                         {'step': 'all'}])},
-                                     'rangeslider': {'visible': True},
-                                     'type': 'date'},
-                              yaxis={"title": "Price (USD)"})
-    st.plotly_chart(fig_highlow)
+    # Sidebar for customization
+    st.sidebar.header("Customize Analysis")
+    plot_type = st.sidebar.selectbox("Select Plot Type", ["Line Chart", "Candlestick Chart"], key=multiselect_key+"_sidebar")
+    show_volume = st.sidebar.checkbox("Show Volume", value=True, key=multiselect_key+"_volume")
 
-    st.header("Facebook Market Volume")
-    fig_volume = go.Figure()
+    # Main plot
+    st.subheader("Stock Prices Over Time")
+
+    fig_stock_prices = go.Figure()
+
+    # Initialize selected_stocks as an empty list if none are selected
     for stock in selected_stocks:
-        fig_volume.add_trace(go.Scatter(x=df[df["Stock"] == stock]["Date"],
-                                        y=df[df["Stock"] == stock]["Volume"],
-                                        mode='lines',
-                                        opacity=0.7,
-                                        name=f'Volume {dropdown[stock]}',
-                                        textposition='bottom center'))
-    fig_volume.update_layout(title=f"Market Volume for {', '.join(str(dropdown[i]) for i in selected_stocks)} Over Time",
-                             xaxis={"title": "Date",
-                                    'rangeselector': {'buttons': list([{'count': 1, 'label': '1M', 'step': 'month',
-                                                                         'stepmode': 'backward'},
-                                                                        {'count': 6, 'label': '6M', 'step': 'month',
-                                                                         'stepmode': 'backward'},
-                                                                        {'step': 'all'}])},
-                                    'rangeslider': {'visible': True},
-                                    'type': 'date'},
-                             yaxis={"title": "Transactions Volume"})
-    st.plotly_chart(fig_volume)
+        if plot_type == "Line Chart":
+            fig_stock_prices.add_trace(go.Scatter(x=df[df["Stock"] == stock]["Date"],
+                                                  y=df[df["Stock"] == stock]["Close"],
+                                                  mode='lines',
+                                                  opacity=0.7,
+                                                  name=f'Close {dropdown[stock]}',
+                                                  textposition='bottom center'))
+        elif plot_type == "Candlestick Chart":
+            fig_stock_prices.add_trace(go.Candlestick(x=df[df["Stock"] == stock]["Date"],
+                                                      open=df[df["Stock"] == stock]["Open"],
+                                                      high=df[df["Stock"] == stock]["High"],
+                                                      low=df[df["Stock"] == stock]["Low"],
+                                                      close=df[df["Stock"] == stock]["Close"],
+                                                      name=f'Candlestick {dropdown[stock]}'))
+
+    fig_stock_prices.update_layout(title=f"{plot_type} - Stock Prices for {', '.join(str(dropdown[i]) for i in selected_stocks)}",
+                                   xaxis={"title": "Date",
+                                          'rangeselector': {'buttons': list([{'count': 1, 'label': '1M', 'step': 'month',
+                                                                               'stepmode': 'backward'},
+                                                                              {'count': 6, 'label': '6M', 'step': 'month',
+                                                                               'stepmode': 'backward'},
+                                                                              {'step': 'all'}])},
+                                   'rangeslider': {'visible': True},
+                                   'type': 'date'},
+                                   yaxis={"title": "Closing Price (USD)"})
+
+    if show_volume:
+        st.subheader("Market Volume")
+        fig_volume = go.Figure()
+
+        # Initialize selected_stocks as an empty list if none are selected
+        for stock in selected_stocks:
+            fig_volume.add_trace(go.Scatter(x=df[df["Stock"] == stock]["Date"],
+                                            y=df[df["Stock"] == stock]["Volume"],
+                                            mode='lines',
+                                            opacity=0.7,
+                                            name=f'Volume {dropdown[stock]}',
+                                            textposition='bottom center'))
+
+        fig_volume.update_layout(title=f"Market Volume for {', '.join(str(dropdown[i]) for i in selected_stocks)}",
+                                 xaxis={"title": "Date",
+                                        'rangeselector': {'buttons': list([{'count': 1, 'label': '1M', 'step': 'month',
+                                                                             'stepmode': 'backward'},
+                                                                            {'count': 6, 'label': '6M', 'step': 'month',
+                                                                             'stepmode': 'backward'},
+                                                                            {'step': 'all'}])},
+                                 'rangeslider': {'visible': True},
+                                 'type': 'date'},
+                                 yaxis={"title": "Transactions Volume"})
+        st.plotly_chart(fig_volume)
+
+    # Highlight Predicted Closing Prices
+    st.subheader("Predicted Closing Prices")
+    fig_predicted_prices = go.Figure()
+
+    for stock in selected_stocks:
+        fig_predicted_prices.add_trace(go.Scatter(x=valid.index, y=valid["Predictions"],
+                                                  mode='lines',
+                                                  opacity=0.7,
+                                                  line=dict(color='orange', width=2),
+                                                  name=f'Predicted {dropdown[stock]}'))
+
+    fig_predicted_prices.update_layout(title=f"Predicted Closing Prices - LSTM Model",
+                                       xaxis={"title": "Date",
+                                              'rangeselector': {'buttons': list([{'count': 1, 'label': '1M', 'step': 'month',
+                                                                                   'stepmode': 'backward'},
+                                                                                  {'count': 6, 'label': '6M', 'step': 'month',
+                                                                                   'stepmode': 'backward'},
+                                                                                  {'step': 'all'}])},
+                                       'rangeslider': {'visible': True},
+                                       'type': 'date'},
+                                       yaxis={"title": "Predicted Closing Price (USD)"})
+    st.plotly_chart(fig_predicted_prices)
+
