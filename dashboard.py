@@ -3,11 +3,13 @@ import pandas as pd
 import plotly.graph_objs as go
 
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import load_model
+import numpy as np
 
-scaler = MinMaxScaler(feature_range=(0,1))
+# Load data
+df_nse = pd.read_csv(r"C:\Users\profi\Downloads\Job\Tesla.csv")
 
-df_nse = pd.read_csv("Tesla.csv")
-
+# Data preprocessing
 df_nse["Date"] = pd.to_datetime(df_nse.Date, format="%Y-%m-%d")
 df_nse.index = df_nse['Date']
 
@@ -26,10 +28,8 @@ dataset = new_data.values
 train = dataset[0:987, :]
 valid = dataset[987:, :]
 
-scaler = MinMaxScaler(feature_range=(0,1))
+scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(dataset)
-
-import numpy as np
 
 x_train, y_train = [], []
 
@@ -40,8 +40,8 @@ for i in range(60, len(train)):
 x_train, y_train = np.array(x_train), np.array(y_train)
 
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-from tensorflow.keras.models import load_model
-model = load_model("saved_lstm_model.h5")
+
+model = load_model(r"C:\Users\profi\Downloads\Job\saved_lstm_model.h5")
 
 inputs = new_data[len(new_data)-len(valid)-60:].values
 inputs = inputs.reshape(-1, 1)
@@ -60,29 +60,31 @@ train = new_data[:987]
 valid = new_data[987:]
 valid['Predictions'] = closing_price
 
+# Load additional data
+df = pd.read_csv(r"C:\Users\profi\Downloads\Job\stock_data.csv")
 
-
-df = pd.read_csv("stock_data.csv")
+# Streamlit app
+st.set_page_config(page_title="Stock Price Analysis Dashboard", layout="wide")
 
 st.title("Stock Price Analysis Dashboard")
 
 tabs = ["Tesla Stock Data", "Facebook Stock Data"]
-selected_tab = st.selectbox("Select dataset", tabs)
+selected_tab = st.selectbox("Select Stock Data", tabs)
 
 if selected_tab == "Tesla Stock Data":
-    st.header("Actual closing price")
+    st.header("Actual Closing Price")
     fig_actual = go.Figure(data=go.Scatter(x=train.index, y=valid["Close"], mode='markers'))
-    fig_actual.update_layout(title='Scatter plot', xaxis={'title': 'Date'}, yaxis={'title': 'Closing Rate'})
+    fig_actual.update_layout(title='Actual Closing Price Over Time', xaxis={'title': 'Date'}, yaxis={'title': 'Closing Rate'})
     st.plotly_chart(fig_actual)
 
-    st.header("LSTM Predicted closing price")
+    st.header("LSTM Predicted Closing Price")
     fig_predicted = go.Figure(data=go.Scatter(x=valid.index, y=valid["Predictions"], mode='markers'))
-    fig_predicted.update_layout(title='Scatter plot', xaxis={'title': 'Date'}, yaxis={'title': 'Closing Rate'})
+    fig_predicted.update_layout(title='LSTM Predicted Closing Price Over Time', xaxis={'title': 'Date'}, yaxis={'title': 'Closing Rate'})
     st.plotly_chart(fig_predicted)
 
 elif selected_tab == "Facebook Stock Data":
     st.header("Facebook Stocks High vs Lows")
-    selected_stocks = st.multiselect("Select stocks", [ 'AAPL', 'FB', 'MSFT'], default=['FB'])
+    selected_stocks = st.multiselect("Select Stocks", ['AAPL', 'FB', 'MSFT'], default=['FB'])
     dropdown = {"AAPL": "Apple", "FB": "Facebook", "MSFT": "Microsoft"}
 
     fig_highlow = go.Figure()
