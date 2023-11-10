@@ -7,7 +7,7 @@ from tensorflow.keras.models import load_model
 import numpy as np
 
 # Load data
-df_nse = pd.read_csv(r"C:\Users\profi\Downloads\Job\Tesla.csv")
+df_nse = pd.read_csv("Tesla.csv")
 
 # Data preprocessing
 df_nse["Date"] = pd.to_datetime(df_nse.Date, format="%Y-%m-%d")
@@ -41,7 +41,7 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-model = load_model(r"C:\Users\profi\Downloads\Job\saved_lstm_model.h5")
+model = load_model("saved_lstm_model.h5")
 
 inputs = new_data[len(new_data)-len(valid)-60:].values
 inputs = inputs.reshape(-1, 1)
@@ -61,7 +61,7 @@ valid = new_data[987:]
 valid['Predictions'] = closing_price
 
 # Load additional data
-df = pd.read_csv(r"C:\Users\profi\Downloads\Job\stock_data.csv")
+df = pd.read_csv("stock_data.csv")
 
 # Streamlit app
 st.set_page_config(page_title="Stock Price Analysis Dashboard", layout="wide")
