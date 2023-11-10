@@ -41,7 +41,7 @@ x_train, y_train = np.array(x_train), np.array(y_train)
 
 x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
 
-model = load_model(r"C:\Users\profi\Downloads\Job\saved_lstm_model.h5")
+model = load_model("saved_lstm_model.h5")
 
 inputs = new_data[len(new_data)-len(valid)-60:].values
 inputs = inputs.reshape(-1, 1)
