@@ -4,3 +4,6 @@ plotly
 scikit-learn
 tensorflow
 protobuf
+ dash
+ dash-html-components
+ dash-core-components
